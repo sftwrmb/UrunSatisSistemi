@@ -5,14 +5,19 @@ import sqlite3
 import tkMessageBox
 
 
+#utf-8 sorunu
+import sys
+reload(sys)
+sys.setdefaultencoding('utf8')
+#türkçe karakter sorunu
+
+
+import smtplib
 
 
 
 import time
 from sinchsms import SinchSMS
-
-
-
 
 
 def listele():
@@ -504,6 +509,13 @@ def kampanya():
         urun.destroy()
         buton22.destroy()
         buton23.destroy()
+        buton37.destroy()
+        buton38.destroy()
+        buton39.destroy()
+        buton40.destroy()
+        buton42.destroy()
+        buton43.destroy()
+
         dataaa=listele3()
 
         yazi34=Label()
@@ -661,28 +673,343 @@ def Sepetim():
         yazi47.config(text=u"Satýn Alýnmadý!", font=("", "12", ""), fg="red")
         yazi47.pack()
 
+def gnclle():
+        ykadi=k.get()
+        ysifre=s.get()
+        pst=ep.get()
+        tel=tl.get()
+        adres=adrs.get()
+
+        kadi=kdi
+        sifre=sfre
+        con = sqlite3.connect("Eticaret.db")
+        cursor = con.cursor()
+        cursor.execute("UPDATE uyeler SET Kullanici_adi=?,Sifre=?,Eposta=?,Telefon=?,il_ilce=? WHERE Kullanici_adi=? AND Sifre=?",(ykadi,ysifre,pst,tel,adres,kadi,sifre))
+        con.commit()
+        con.close()
+        yazi65.config(text=u"Hesabýnýz Baþarýyla Güncellendi!",font=("","12",""),fg="green")
+
+
+
 
 def hesabimi_duzenle():
-        pass
+        yazi31.destroy()
+        yazi32.destroy()
+        yazi33.destroy()
+        buton18.destroy()
+        buton19.destroy()
+
+        buton21.destroy()
+        urun.destroy()
+        buton22.destroy()
+        buton23.destroy()
+        buton37.destroy()
+        buton38.destroy()
+        buton39.destroy()
+        buton40.destroy()
+        buton42.destroy()
+        buton43.destroy()
+
+        yazi60=Label()
+        yazi60.config(text=u"Hesabýmý Düzenle",font=("","15",""),fg="brown")
+        yazi60.pack()
+
+        yazi60 = Label()
+        yazi60.config(text=u"Kullanýcý Adý: ", font=("", "12", ""))
+        yazi60.pack()
+
+        global k
+        k=Entry()
+        k.pack()
+
+        yazi61 = Label()
+        yazi61.config(text=u"Þifre: ", font=("", "12", ""))
+        yazi61.pack()
+
+        global s
+        s=Entry(show="*")
+        s.pack()
+
+        yazi62 = Label()
+        yazi62.config(text=u"E-posta: ", font=("", "12", ""))
+        yazi62.pack()
+
+        global ep
+        ep=Entry()
+        ep.pack()
+
+        yazi63 = Label()
+        yazi63.config(text=u"Telefon: ", font=("", "12", ""))
+        yazi63.pack()
+
+        global tl
+        tl=Entry()
+        tl.pack()
+
+        yazi64=Label()
+        yazi64.config(text=u"Ýl-Ýlçe: ", font=("","12",""))
+        yazi64.pack()
+
+        global adrs
+        adrs=Entry()
+        adrs.pack()
+
+        buton44=Button()
+        buton44.config(text=u"Güncelleme Yap",width=20,height=2,command=gnclle)
+        buton44.pack()
+
+        global yazi65
+        yazi65=Label()
+        yazi65.config(text=u"Güncelleme Yapýlmadý!",font=("","12",""),fg="brown")
+        yazi65.pack()
+
+
+def hsil():
+        kadi=kdi
+        sifre=sfre.get()
+
+        con = sqlite3.connect("Eticaret.db")
+        cursor = con.cursor()
+        cursor.execute("DELETE FROM uyeler WHERE Kullanici_adi=? AND Sifre=?",(kadi,sifre))
+        if cursor.fetchall():
+               yazi67.config(text=u"Hesabýnýz Silindi!",font=("","12",""),fg="blue")
+        else:
+               yazi67.config(text=u"Hesap Silme Ýþlemi Baþarýsýz!",font=("","12",""),fg="red")
+
+        con.commit() #veritabanýna yapýlan deðiþiklikleri gönder
+        con.close()
 
 
 def hesabimi_sil():
-        pass
+        yazi31.destroy()
+        yazi32.destroy()
+        yazi33.destroy()
+        buton18.destroy()
+        buton19.destroy()
+
+        buton21.destroy()
+        urun.destroy()
+        buton22.destroy()
+        buton23.destroy()
+        buton37.destroy()
+        buton38.destroy()
+        buton39.destroy()
+        buton40.destroy()
+        buton42.destroy()
+        buton43.destroy()
+
+        yazi66=Label()
+        yazi66.config(text=u"Þifrenizi giriniz: ",font=("","12",""))
+        yazi66.pack()
+
+        global sfre
+        sfre=Entry(show="*")
+        sfre.pack()
+
+        buton45=Button()
+        buton45.config(text=u"Hesabýmý Sil",width=20,height=2,command=hsil)
+        buton45.pack()
+
+        global yazi67
+        yazi67=Label()
+        yazi67.config(text=u"Hesabýnýzý Silmediniz!",font=("","12",""),fg="brown")
+        yazi67.pack()
+
+
+
+def srgu():
+        kadi=kdi
+        urn_bilgi=urn_bilgisi.get()
+        con = sqlite3.connect("Eticaret.db")
+        cursor = con.cursor()
+        cursor.execute("SELECT urun_adi,COUNT(urun_adi),SUM(fiyat) FROM sepetim WHERE kullanici=? GROUP BY urun_adi HAVING urun_adi=?", (kadi,urn_bilgi))
+        datasrgu=cursor.fetchall()
+        yazi68.config(text=u"Ürün Adý,Adeti ve Toplam Fiyat: "+str(datasrgu[0]).strip(" ,;[]()'u") + "  ", font=("", "12", ""), fg="brown")
+        con.close()
+
+
+
+
+
+def cikar():
+        urn_bilgi=urn_bilgisi.get()
+        kadi=kdi
+        con = sqlite3.connect("Eticaret.db")
+        cursor = con.cursor()
+        cursor.execute("SELECT urun_adi,COUNT(urun_adi) FROM sepetim WHERE kullanici=? AND urun_adi=?",(kadi,urn_bilgi))
+        data=cursor.fetchall()
+        cursor.execute("DELETE FROM sepetim WHERE kullanici=? AND urun_adi=?",(kadi,data[0][0]))
+        yazi69.config(text=u"Ürün Çýkarma Ýþlemi Baþarýlý!", font=("", "12", ""), fg="green")
+        con.commit()
+        con.close()
+
+
+
 
 
 def urun_cikar():
-        pass
+        yazi31.destroy()
+        yazi32.destroy()
+        yazi33.destroy()
+        buton18.destroy()
+        buton19.destroy()
+        buton21.destroy()
+        urun.destroy()
+        buton22.destroy()
+        buton23.destroy()
+        buton37.destroy()
+        buton38.destroy()
+        buton39.destroy()
+        buton40.destroy()
+        buton42.destroy()
+        buton43.destroy()
+
+        yazi68=Label()
+        yazi68.config(text=u"Urun Bilgisini Giriniz: ",font=("","12",""))
+        yazi68.pack()
+
+        global urn_bilgisi
+        urn_bilgisi=Entry()
+        urn_bilgisi.pack()
+
+        buton46=Button()
+        buton46.config(text=u"Sorgula",width=20,height=2,command=srgu)
+        buton46.pack()
+
+        global yazi68
+        yazi68 = Label()
+        yazi68.config(text=u"Ürün Bilgisi Listelenmedi!", font=("","12",""),fg="brown")
+        yazi68.pack()
+
+        buton47 = Button()
+        buton47.config(text=u"Çýkar", width=20, height=2,command=cikar)
+        buton47.pack()
+
+        global yazi69
+        yazi69 = Label()
+        yazi69.config(text=u"Ürün Çýkarma Ýþlemi Yapýlmadý!", font=("", "12", ""),fg="brown")
+        yazi69.pack()
+
+
+def gonder():
+        kadi=kdi
+        msj=mesaj.get()
+        km=kime.get()
+        con = sqlite3.connect("Eticaret.db")
+        cursor = con.cursor()
+        cursor.execute("INSERT INTO mesajlarim(kimden,mesaj,kime) VALUES(?,?,?)", (kadi,msj,km))
+        con.commit()
+        yazi75.config(text=u"Mesaj Baþarýyla Gönderildi!", font=("", "12", ""), fg="green")
+        con.close()
+
+
+
 
 
 def mesajlarim():
-        pass
+        yazi31.destroy()
+        yazi32.destroy()
+        yazi33.destroy()
+        buton18.destroy()
+        buton19.destroy()
+        buton21.destroy()
+        urun.destroy()
+        buton22.destroy()
+        buton23.destroy()
+        buton37.destroy()
+        buton38.destroy()
+        buton39.destroy()
+        buton40.destroy()
+        buton42.destroy()
+        buton43.destroy()
+
+        yazi71=Label()
+        yazi71.config(text=u"Mesajlarým: ",font=("","15",""),fg="brown")
+        yazi71.pack()
+
+        kadi = kdi
+        con = sqlite3.connect("Eticaret.db")
+        cursor = con.cursor()
+        cursor.execute("SELECT kimden,mesaj FROM mesajlarim WHERE kime=? GROUP BY kime ORDER BY id DESC LIMIT 1",(kadi,))
+        data = cursor.fetchall()
+        yazi74 = Label()
+        yazi74.config(text="Kimden: "+str(data[0][0]).strip(" ,;[]()'u")+"  Mesaj: "+str(data[0][1]).strip(" ,;()[]'u"), font=("", "12", ""), fg="brown")
+        yazi74.pack()
+        con.close()
+
+        yazi72 = Label()
+        yazi72.config(text=u"Mesaj Gönder: ", font=("", "12", ""))
+        yazi72.pack()
+
+        global mesaj
+        mesaj = Entry()
+        mesaj.pack()
+
+        yazi73=Label()
+        yazi73.config(text=u"Kime: ",font=("","12",""))
+        yazi73.pack()
+
+        global kime
+        kime=Entry()
+        kime.pack()
+
+        buton44=Button()
+        buton44.config(text=u"Gönder",width=20,height=2,command=gonder)
+        buton44.pack()
+
+        global yazi75
+        yazi75 = Label()
+        yazi75.config(text=u"Mesaj Gönderilmedi!", font=("", "12", ""),fg="brown")
+        yazi75.pack()
 
 
 def favorilerim():
-        pass
+        yazi31.destroy()
+        yazi32.destroy()
+        yazi33.destroy()
+        buton18.destroy()
+        buton19.destroy()
+        buton21.destroy()
+        urun.destroy()
+        buton22.destroy()
+        buton23.destroy()
+        buton37.destroy()
+        buton38.destroy()
+        buton39.destroy()
+        buton40.destroy()
+        buton42.destroy()
+        buton43.destroy()
+
+        kadi=kdi
+        con = sqlite3.connect("Eticaret.db")
+        cursor = con.cursor()
+        cursor.execute("SELECT urun_adi,toplam_fiyat,adet FROM Odeme WHERE kullanici=? AND adet=(SELECT MAX(adet) FROM Odeme)",(kadi,))
+        data = cursor.fetchall()
+        yazi70=Label()
+        yazi70.config(text=u"Favori Ürünlerim: "+str(data[0]).strip(" ,;[]()'u"),font=("","12",""),fg="brown")
+        yazi70.pack()
+        con.close()
+
 
 def cikis():
-        pass
+        yazi31.destroy()
+        yazi32.destroy()
+        yazi33.destroy()
+        buton18.destroy()
+        buton19.destroy()
+
+        buton21.destroy()
+        urun.destroy()
+        buton22.destroy()
+        buton23.destroy()
+        buton37.destroy()
+        buton38.destroy()
+        buton39.destroy()
+        buton40.destroy()
+        buton42.destroy()
+        buton43.destroy()
+        Button(pencere, text="Quit",width=20,height=2, command=pencere.destroy).pack()
+
 
 
 
@@ -734,26 +1061,32 @@ def GirisYap():
                 buton21.config(text=u"Kampanyalar",width=20,height=2,command=kampanya)
                 buton21.pack()
 
+                global buton37
                 buton37 = Button()
                 buton37.config(text=u"Hesabýmý Düzenle", width=20, height=2,command=hesabimi_duzenle)
                 buton37.pack()
 
+                global buton38
                 buton38 = Button()
                 buton38.config(text=u"Hesabýmý Sil", width=20, height=2,command=hesabimi_sil)
                 buton38.pack()
 
+                global buton39
                 buton39 = Button()
                 buton39.config(text=u"Ürün Çýkar", width=20, height=2,command=urun_cikar)
                 buton39.pack()
 
+                global buton40
                 buton40 = Button()
                 buton40.config(text=u"Mesajlarým", width=20, height=2,command=mesajlarim)
                 buton40.pack()
 
+                global buton42
                 buton42 = Button()
                 buton42.config(text=u"Favorilerim", width=20, height=2,command=favorilerim)
                 buton42.pack()
 
+                global buton43
                 buton43 = Button()
                 buton43.config(text=u"Çýkýþ Yap", width=20, height=2,command=cikis)
                 buton43.pack()
@@ -952,15 +1285,6 @@ def sikayett():
 
 
 
-
-
-
-
-
-
-
-
-
 def urun_sikayet():
         yazi2.destroy()
         yazi3.destroy()
@@ -1035,19 +1359,572 @@ def urun_sikayet():
 
 
 def yardim_destek():
-        pass
+        yazi2.destroy()
+        yazi3.destroy()
+        yazi4.destroy()
+        yazi5.destroy()
+        yazi6.destroy()
+        yazi7.destroy()
+        yazi8.destroy()
+        ktu.destroy()
+        kutu.destroy()
+        kutu2.destroy()
+        buton.destroy()
+        buton1.destroy()
+        buton2.destroy()
+        buton3.destroy()
+        buton4.destroy()
+        buton5.destroy()
+        buton31.destroy()
+        buton34.destroy()
+        buton35.destroy()
+        buton36.destroy()
+        buton41.destroy()
+
+        con = sqlite3.connect("Eticaret.db")
+        cursor = con.cursor()
+        cursor.execute("SELECT * FROM yardim")
+        data = cursor.fetchall()
+
+
+        yazi75=Label()
+        yazi75.config(text=u"Yardým ve Destek Sayfasýna Hoþgeldiniz!",font=("","15",""),fg="brown")
+        yazi75.pack()
+
+        yazi76 = Label()
+        yazi76.config(text=u"Soru1: "+str(data[0][0]).strip(" ,;()[]'u")+"\n Cevap: "+str(data[0][1]).strip(" ,;()[]'u"), font=("", "12", ""))
+        yazi76.pack()
+
+        yazi77 = Label()
+        yazi77.config(text=u"Soru2: "+str(data[1][0]).strip(" ,;()[]'u")+"\n Cevap: "+str(data[1][1]).strip(" ,;()[]'u"), font=("", "12", ""))
+        yazi77.pack()
+
+        yazi78 = Label()
+        yazi78.config(text=u"Soru3: "+str(data[2][0]).strip(" ,;()[]'u")+"\n Cevap: "+str(data[2][1]).strip(" ,;[]()'u"), font=("", "12", ""))
+        yazi78.pack()
+
+        yazi79 = Label()
+        yazi79.config(text=u"Soru4: " + str(data[3][0]).strip(" ,;()[]'u") + "\n Cevap: " + str(data[3][1]).strip(" ,;[]()'u"), font=("", "12", ""))
+        yazi79.pack()
+
+        yazi80 = Label()
+        yazi80.config(text=u"Soru5: " + str(data[4][0]).strip(" ,;()[]'u") + "\n Cevap: " + str(data[4][1]).strip(" ,;[]()'u"), font=("", "12", ""))
+        yazi80.pack()
+
+        con.close()
+
+def bul():
+
+        klm=kelime.get()
+        con = sqlite3.connect("Eticaret.db")
+        cursor = con.cursor()
+        cursor.execute("SELECT * FROM yardim WHERE Soru LIKE ?",('%'+klm+'%',))
+        data = cursor.fetchall()
+        if len(data)>0:
+                yazi82.config(text="Soru: "+str(data[0][0]).strip(" ,;()[]'u")+" \nCevap: "+str(data[0][1]).strip(" ,;()[]'u"),font=("","12",""))
+        else:
+                yazi82.config(text=u"Hiçbir Sonuç Bulunamadý!",font=("","12",""),fg="red")
+        con.close()
+
 
 
 def bize_sorun():
-        pass
+        yazi2.destroy()
+        yazi3.destroy()
+        yazi4.destroy()
+        yazi5.destroy()
+        yazi6.destroy()
+        yazi7.destroy()
+        yazi8.destroy()
+        ktu.destroy()
+        kutu.destroy()
+        kutu2.destroy()
+        buton.destroy()
+        buton1.destroy()
+        buton2.destroy()
+        buton3.destroy()
+        buton4.destroy()
+        buton5.destroy()
+        buton31.destroy()
+        buton34.destroy()
+        buton35.destroy()
+        buton36.destroy()
+        buton41.destroy()
+
+        yazi81=Label()
+        yazi81.config(text=u"Bir kelime giriniz: ",font=("","12",""))
+        yazi81.pack()
+
+        global kelime
+        kelime=Entry()
+        kelime.pack()
+
+        buton48=Button()
+        buton48.config(text=u"Sorgula",width=20,height=2,command=bul)
+        buton48.pack()
+
+        global yazi82
+        yazi82=Label()
+        yazi82.config(text=u"Henüz Sorgulama Yapýlmadý!",font=("","12",""),fg="brown")
+        yazi82.pack()
+
 
 
 def encok():
-        pass
+        yazi2.destroy()
+        yazi3.destroy()
+        yazi4.destroy()
+        yazi5.destroy()
+        yazi6.destroy()
+        yazi7.destroy()
+        yazi8.destroy()
+        ktu.destroy()
+        kutu.destroy()
+        kutu2.destroy()
+        buton.destroy()
+        buton1.destroy()
+        buton2.destroy()
+        buton3.destroy()
+        buton4.destroy()
+        buton5.destroy()
+        buton31.destroy()
+        buton34.destroy()
+        buton35.destroy()
+        buton36.destroy()
+        buton41.destroy()
+
+        yazi83=Label()
+        yazi83.config(text=u"En Çok Satan Ürünler",font=("","12",""),fg="brown")
+        yazi83.pack()
+
+        con = sqlite3.connect("Eticaret.db")
+        cursor = con.cursor()
+        cursor.execute("SELECT urun_adi,adet FROM Odeme WHERE adet=(SELECT Max(adet) FROM Odeme)")
+        data = cursor.fetchall()
+
+        yazi84=Label()
+        yazi84.config(text=u"\nÜrün Adý: "+str(data[0][0]).strip(" ,;()[]'u")+u"  Ürün Adedi: "+str(data[0][1]).strip(" ,;()[]'u"),font=("","12",""),fg="blue")
+        yazi84.pack()
+
+        yazi85=Label()
+        yazi85.config(text=u"\nÜrün Adý: "+str(data[1][0]).strip(" ,;()[]'u")+u"  Ürün Adedi: "+str(data[1][1]).strip(" ,;()[]'u"),font=("","12",""),fg="blue")
+        yazi85.pack()
+
+        con.close()
+
+
+def gnder():
+
+        k=kullaniciadi.get()
+        e=Eposta.get()
+
+        #hesap bilgilerimiz
+        kul="mstf.bz.95@gmail.com"
+        sif="Mstf1995"
+
+        con = sqlite3.connect("Eticaret.db")
+        cursor = con.cursor()
+        cursor.execute("SELECT Sifre FROM uyeler WHERE Kullanici_adi=?",(k,))
+        data = cursor.fetchall()
+        data=str(data).split(" ,;()[]'u")
+        if len(data)>0:
+                alici = e
+                konu = u"Þifre"
+                mesaj = data
+                email_text = "From:{} To:{} Subject:{} {}".format(kul,alici,konu,mesaj)
+
+                try:
+                        server=smtplib.SMTP('smtp.gmail.com:587')
+                        server.starttls()
+                        server.login(kul,sif)
+                        server.sendmail(kul,alici,email_text)
+                        server.close()
+                        yazi89.config(text=u"Mail Adresinize Þifreniz Gönderilmiþtir!",font=("","12",""),fg="green")
+
+                except:
+                        yazi89.config(text=u"Bir Hata Oluþtu!",font=("","12",""),fg="red")
+
+
+
+        else:
+                yazi89.config(text=u"Kullanýcý adýnýz hatalýdýr!",font=("","12",""),fg="red")
+
+
+        con.close()
+
+
+
+
+
+
+
+
 
 def sifremi_unuttum():
-        pass
+        yazi2.destroy()
+        yazi3.destroy()
+        yazi4.destroy()
+        yazi5.destroy()
+        yazi6.destroy()
+        yazi7.destroy()
+        yazi8.destroy()
+        ktu.destroy()
+        kutu.destroy()
+        kutu2.destroy()
+        buton.destroy()
+        buton1.destroy()
+        buton2.destroy()
+        buton3.destroy()
+        buton4.destroy()
+        buton5.destroy()
+        buton31.destroy()
+        buton34.destroy()
+        buton35.destroy()
+        buton36.destroy()
+        buton41.destroy()
 
+        yazi86=Label()
+        yazi86.config(text=u"Þifremi Unuttum..",font=("","15",""),fg="brown")
+        yazi86.pack()
+
+        yazi87 = Label()
+        yazi87.config(text=u"\n\nKullanýcý Adý: ", font=("", "12", ""))
+        yazi87.pack()
+
+        global kullaniciadi
+        kullaniciadi=Entry()
+        kullaniciadi.pack()
+
+        yazi88 = Label()
+        yazi88.config(text=u"E-posta: ", font=("", "12", ""))
+        yazi88.pack()
+
+        global Eposta
+        Eposta=Entry()
+        Eposta.pack()
+
+        buton49=Button()
+        buton49.config(text=u"Gönder",width=20,height=2,command=gnder)
+        buton49.pack()
+
+        global yazi89
+        yazi89=Label()
+        yazi89.config(text=u"\nEposta adresine þifre gönderilmedi!",font=("","12",""),fg="brown")
+        yazi89.pack()
+
+def tum():
+        yazi2.destroy()
+        yazi3.destroy()
+        yazi4.destroy()
+        yazi5.destroy()
+        yazi6.destroy()
+        yazi7.destroy()
+        yazi8.destroy()
+        ktu.destroy()
+        kutu.destroy()
+        kutu2.destroy()
+        buton.destroy()
+        buton1.destroy()
+        buton2.destroy()
+        buton3.destroy()
+        buton4.destroy()
+        buton5.destroy()
+        buton31.destroy()
+        buton34.destroy()
+        buton35.destroy()
+        buton36.destroy()
+        buton41.destroy()
+        buton50.destroy()
+        buton51.destroy()
+        buton52.destroy()
+        buton53.destroy()
+        buton54.destroy()
+
+        con = sqlite3.connect("Eticaret.db")
+        cursor = con.cursor()
+        cursor.execute("SELECT kategoriler.urun_kategori,urunler.urun_adi,urunler.urun_markasi,urunler.fiyat,urunler.adet FROM kategoriler INNER JOIN urunler ON kategoriler.urun_id=urunler.urun_id LIMIT 10")
+        data = cursor.fetchall()
+
+
+
+        yazi90=Label()
+        yazi90.config(text="Kategori,Ürün Adý, Markasi, Fiyat, Adet:   "+str(data[0]).strip(" ,;()[]'u"),font=("","12",""),fg="brown")
+        yazi90.pack()
+
+        yazi91 = Label()
+        yazi91.config(text="Kategori,Ürün Adý, Markasi, Fiyat, Adet:   "+str(data[1]).strip(" ,;()[]'u"), font=("", "12", ""), fg="brown")
+        yazi91.pack()
+
+        yazi92 = Label()
+        yazi92.config(text="Kategori,Ürün Adý, Markasi, Fiyat, Adet:   "+str(data[2]).strip(" ,;()[]'u"), font=("", "12", ""), fg="brown")
+        yazi92.pack()
+
+        yazi93 = Label()
+        yazi93.config(text="Kategori,Ürün Adý, Markasi, Fiyat, Adet:   "+str(data[3]).strip(" ,;()[]'u"), font=("", "12", ""), fg="brown")
+        yazi93.pack()
+
+        yazi94 = Label()
+        yazi94.config(text="Kategori,Ürün Adý, Markasi, Fiyat, Adet:   "+str(data[4]).strip(" ,;()[]'u"), font=("", "12", ""), fg="brown")
+        yazi94.pack()
+
+        yazi95 = Label()
+        yazi95.config(text="Kategori,Ürün Adý, Markasi, Fiyat, Adet:   "+str(data[5]).strip(" ,;()[]'u"), font=("", "12", ""), fg="brown")
+        yazi95.pack()
+
+        yazi96 = Label()
+        yazi96.config(text="Kategori,Ürün Adý, Markasi, Fiyat, Adet:   "+str(data[6]).strip(" ,;()[]'u"), font=("", "12", ""), fg="brown")
+        yazi96.pack()
+
+        yazi97 = Label()
+        yazi97.config(text="Kategori,Ürün Adý, Markasi, Fiyat, Adet:   "+str(data[7]).strip(" ,;()[]'u"), font=("", "12", ""), fg="brown")
+        yazi97.pack()
+
+        yazi98 = Label()
+        yazi98.config(text="Kategori,Ürün Adý, Markasi, Fiyat, Adet:   "+str(data[8]).strip(" ,;()[]'u"), font=("", "12", ""), fg="brown")
+        yazi98.pack()
+
+        yazi99 = Label()
+        yazi99.config(text="Kategori,Ürün Adý, Markasi, Fiyat, Adet:   "+str(data[9]).strip(" ,;()[]'u"), font=("", "12", ""), fg="brown")
+        yazi99.pack()
+
+        con.close()
+
+
+
+def endusuk():
+        yazi2.destroy()
+        yazi3.destroy()
+        yazi4.destroy()
+        yazi5.destroy()
+        yazi6.destroy()
+        yazi7.destroy()
+        yazi8.destroy()
+        ktu.destroy()
+        kutu.destroy()
+        kutu2.destroy()
+        buton.destroy()
+        buton1.destroy()
+        buton2.destroy()
+        buton3.destroy()
+        buton4.destroy()
+        buton5.destroy()
+        buton31.destroy()
+        buton34.destroy()
+        buton35.destroy()
+        buton36.destroy()
+        buton41.destroy()
+        buton50.destroy()
+        buton51.destroy()
+        buton52.destroy()
+        buton53.destroy()
+        buton54.destroy()
+
+        con = sqlite3.connect("Eticaret.db")
+        cursor = con.cursor()
+        cursor.execute("SELECT urun_adi,urun_markasi,fiyat FROM urunler ORDER BY fiyat ASC LIMIT 10")
+        data = cursor.fetchall()
+
+        yazi100 = Label()
+        yazi100.config(text=u"Ürün Adý, Markasý, Fiyat:   " + str(data[0]).strip(" ,;()[]'u"),font=("", "12", ""), fg="brown")
+        yazi100.pack()
+
+        yazi101 = Label()
+        yazi101.config(text=u"Ürün Adý, Markasý, Fiyat:   "+ str(data[1]).strip(" ,;()[]'u"),font=("", "12", ""), fg="brown")
+        yazi101.pack()
+
+        yazi102 = Label()
+        yazi102.config(text=u"Ürün Adý, Markasý, Fiyat:   "+ str(data[2]).strip(" ,;()[]'u"),font=("", "12", ""), fg="brown")
+        yazi102.pack()
+
+        yazi103 = Label()
+        yazi103.config(text=u"Ürün Adý, Markasý, Fiyat:   " + str(data[3]).strip(" ,;()[]'u"),font=("", "12", ""), fg="brown")
+        yazi103.pack()
+
+        yazi104 = Label()
+        yazi104.config(text=u"Ürün Adý, Markasý, Fiyat:   " + str(data[4]).strip(" ,;()[]'u"),font=("", "12", ""), fg="brown")
+        yazi104.pack()
+
+        yazi105 = Label()
+        yazi105.config(text=u"Ürün Adý, Markasý, Fiyat:   "+ str(data[5]).strip(" ,;()[]'u"),font=("", "12", ""), fg="brown")
+        yazi105.pack()
+
+        yazi106 = Label()
+        yazi106.config(text=u"Ürün Adý, Markasý, Fiyat:   " + str(data[6]).strip(" ,;()[]'u"),font=("", "12", ""), fg="brown")
+        yazi106.pack()
+
+        yazi107 = Label()
+        yazi107.config(text=u"Ürün Adý, Markasý, Fiyat:   " + str(data[7]).strip(" ,;()[]'u"),font=("", "12", ""), fg="brown")
+        yazi107.pack()
+
+        yazi108 = Label()
+        yazi108.config(text=u"Ürün Adý, Markasý, Fiyat:   "+ str(data[8]).strip(" ,;()[]'u"),font=("", "12", ""), fg="brown")
+        yazi108.pack()
+
+        yazi109 = Label()
+        yazi109.config(text=u"Ürün Adý, Markasý, Fiyat:   " + str(data[9]).strip(" ,;()[]'u"),font=("", "12", ""), fg="brown")
+        yazi109.pack()
+
+        con.close()
+
+
+
+
+def toplam():
+        yazi2.destroy()
+        yazi3.destroy()
+        yazi4.destroy()
+        yazi5.destroy()
+        yazi6.destroy()
+        yazi7.destroy()
+        yazi8.destroy()
+        ktu.destroy()
+        kutu.destroy()
+        kutu2.destroy()
+        buton.destroy()
+        buton1.destroy()
+        buton2.destroy()
+        buton3.destroy()
+        buton4.destroy()
+        buton5.destroy()
+        buton31.destroy()
+        buton34.destroy()
+        buton35.destroy()
+        buton36.destroy()
+        buton41.destroy()
+        buton50.destroy()
+        buton51.destroy()
+        buton52.destroy()
+        buton53.destroy()
+        buton54.destroy()
+
+        con = sqlite3.connect("Eticaret.db")
+        cursor = con.cursor()
+        cursor.execute("SELECT kategoriler.urun_kategori,SUM(urunler.fiyat) FROM kategoriler INNER JOIN urunler ON kategoriler.urun_id=urunler.urun_id GROUP BY kategoriler.urun_kategori")
+        data = cursor.fetchall()
+
+        yazi110 = Label()
+        yazi110.config(text=u"Kategori, Toplam Fiyat:   " + str(data[0]).strip(" ,;()[]'u"), font=("", "12", ""),fg="brown")
+        yazi110.pack()
+
+        yazi111 = Label()
+        yazi111.config(text=u"Kategori, Toplam Fiyat:   " + str(data[1]).strip(" ,;()[]'u"), font=("", "12", ""),fg="brown")
+        yazi111.pack()
+
+        yazi112 = Label()
+        yazi112.config(text=u"Kategori, Toplam Fiyat:   " + str(data[2]).strip(" ,;()[]'u"), font=("", "12", ""),fg="brown")
+        yazi112.pack()
+
+        yazi113 = Label()
+        yazi113.config(text=u"Kategori, Toplam Fiyat:   " + str(data[3]).strip(" ,;()[]'u"), font=("", "12", ""),fg="brown")
+        yazi113.pack()
+
+
+
+        con.close()
+
+
+def adet():
+        yazi2.destroy()
+        yazi3.destroy()
+        yazi4.destroy()
+        yazi5.destroy()
+        yazi6.destroy()
+        yazi7.destroy()
+        yazi8.destroy()
+        ktu.destroy()
+        kutu.destroy()
+        kutu2.destroy()
+        buton.destroy()
+        buton1.destroy()
+        buton2.destroy()
+        buton3.destroy()
+        buton4.destroy()
+        buton5.destroy()
+        buton31.destroy()
+        buton34.destroy()
+        buton35.destroy()
+        buton36.destroy()
+        buton41.destroy()
+        buton50.destroy()
+        buton51.destroy()
+        buton52.destroy()
+        buton53.destroy()
+        buton54.destroy()
+
+        con = sqlite3.connect("Eticaret.db")
+        cursor = con.cursor()
+        cursor.execute("SELECT kategoriler.urun_kategori,SUM(urunler.adet) FROM kategoriler INNER JOIN urunler ON kategoriler.urun_id=urunler.urun_id GROUP BY kategoriler.urun_kategori")
+        data = cursor.fetchall()
+
+        yazi114 = Label()
+        yazi114.config(text=u"Kategori, Toplam Adet:   " + str(data[0]).strip(" ,;()[]'u"), font=("", "12", ""),fg="brown")
+        yazi114.pack()
+
+        yazi115 = Label()
+        yazi115.config(text=u"Kategori, Toplam Adet:   " + str(data[1]).strip(" ,;()[]'u"), font=("", "12", ""),fg="brown")
+        yazi115.pack()
+
+        yazi116 = Label()
+        yazi116.config(text=u"Kategori, Toplam Adet:   " + str(data[2]).strip(" ,;()[]'u"), font=("", "12", ""),fg="brown")
+        yazi116.pack()
+
+        yazi117 = Label()
+        yazi117.config(text=u"Kategori, Toplam Adet:   " + str(data[3]).strip(" ,;()[]'u"), font=("", "12", ""),fg="brown")
+        yazi117.pack()
+
+        con.close()
+
+
+def ortalama():
+        yazi2.destroy()
+        yazi3.destroy()
+        yazi4.destroy()
+        yazi5.destroy()
+        yazi6.destroy()
+        yazi7.destroy()
+        yazi8.destroy()
+        ktu.destroy()
+        kutu.destroy()
+        kutu2.destroy()
+        buton.destroy()
+        buton1.destroy()
+        buton2.destroy()
+        buton3.destroy()
+        buton4.destroy()
+        buton5.destroy()
+        buton31.destroy()
+        buton34.destroy()
+        buton35.destroy()
+        buton36.destroy()
+        buton41.destroy()
+        buton50.destroy()
+        buton51.destroy()
+        buton52.destroy()
+        buton53.destroy()
+        buton54.destroy()
+
+        con = sqlite3.connect("Eticaret.db")
+        cursor = con.cursor()
+        cursor.execute("SELECT kategoriler.urun_kategori,AVG(urunler.fiyat) FROM kategoriler INNER JOIN urunler ON kategoriler.urun_id=urunler.urun_id GROUP BY kategoriler.urun_kategori")
+        data = cursor.fetchall()
+
+        yazi117 = Label()
+        yazi117.config(text=u"Kategori, Ortalama Fiyat:   " + str(data[0]).strip(" ,;()[]'u"), font=("", "12", ""),fg="brown")
+        yazi117.pack()
+
+        yazi118 = Label()
+        yazi118.config(text=u"Kategori, Ortalama Fiyat:   " + str(data[1]).strip(" ,;()[]'u"), font=("", "12", ""),fg="brown")
+        yazi118.pack()
+
+        yazi119 = Label()
+        yazi119.config(text=u"Kategori, Ortalama Fiyat:   " + str(data[2]).strip(" ,;()[]'u"), font=("", "12", ""),fg="brown")
+        yazi119.pack()
+
+        yazi120 = Label()
+        yazi120.config(text=u"Kategori, Ortalama Fiyat:   " + str(data[3]).strip(" ,;()[]'u"), font=("", "12", ""),fg="brown")
+        yazi120.pack()
+
+        con.close()
 
 
 def Sorgula():
@@ -1143,19 +2020,19 @@ buton.pack()
 
 
 yazi5=Label(pencere)
-yazi5.config(text=u"Ürün bilgisi listelenmedi!\n",font=("","12",""),fg="red")
+yazi5.config(text=u"Ürün bilgisi listelenmedi!",font=("","12",""),fg="red")
 yazi5.pack()
 
 yazi6=Label(pencere)
-yazi6.config(text=u"Ürün bilgisi listelenmedi!\n",font=("","12",""),fg="red")
+yazi6.config(text=u"Ürün bilgisi listelenmedi!",font=("","12",""),fg="red")
 yazi6.pack()
 
 yazi7=Label(pencere)
-yazi7.config(text=u"Ürün bilgisi listelenmedi!\n",font=("","12",""),fg="red")
+yazi7.config(text=u"Ürün bilgisi listelenmedi!",font=("","12",""),fg="red")
 yazi7.pack()
 
 yazi8=Label(pencere)
-yazi8.config(text=u"Ürün bilgisi listelenmedi!\n",font=("","12",""),fg="red")
+yazi8.config(text=u"Ürün bilgisi listelenmedi!",font=("","12",""),fg="red")
 yazi8.pack()
 
 
@@ -1197,12 +2074,36 @@ buton35.config(text=u"Bize Sorun",width=20,height=1,command=bize_sorun)
 buton35.pack()
 
 buton36=Button(pencere)
-buton36.config(text=u"Ençok Satan,Endüþük Fiyatlý",width=20,height=1,command=encok)
+buton36.config(text=u"Ençok Satan Ürünler",width=20,height=1,command=encok)
 buton36.pack()
 
 buton41=Button(pencere)
 buton41.config(text=u"Þifremi Unuttum",width=20,height=1,command=sifremi_unuttum)
 buton41.pack()
+
+buton50=Button()
+buton50.config(text=u"Ýlk 10 Ürün ve Kategoriler",width=22,height=1,command=tum)
+buton50.pack()
+
+buton51=Button()
+buton51.config(text=u"En Ucuz Ürünler",width=22,height=1,command=endusuk)
+buton51.pack()
+
+buton52=Button()
+buton52.config(text=u"Kategoriler ve Toplam Fiyat",width=22,height=1,command=toplam)
+buton52.pack()
+
+buton53=Button()
+buton53.config(text=u"Kategoriler ve Adet",width=22,height=1,command=adet)
+buton53.pack()
+
+buton54=Button()
+buton54.config(text=u"Kategoriler ve Ortalama Fiyat",width=22,height=1,command=ortalama)
+buton54.pack()
+
+
+
+
 
 mainloop()
 
